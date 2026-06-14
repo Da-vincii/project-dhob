@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Project dhoB — A community of cloth & craft</title>
+<meta name="description" content="Project dhoB is a living community of the hands behind your clothes — dhobis, tailors, embroiderers, cobblers, darners and more. Their craft, on demand." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --paper:#f3efe6; --paper-2:#ece6d9; --ink:#16120d; --ink-soft:#4a4239;
+    --terra:#c0563b; --terra-deep:#9c3f29; --indigo:#2f3a8f;
+    --line:rgba(22,18,13,.12);
+    --serif:'Fraunces',Georgia,serif; --sans:'Plus Jakarta Sans',system-ui,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--paper);color:var(--ink)}
+  body{font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+  ::selection{background:var(--terra);color:var(--paper)}
+
+  @media(hover:hover) and (pointer:fine){ *{cursor:none !important} }
+
+  /* ---- CUSTOM CURSOR ---- */
+  #cursor-canvas{position:fixed;inset:0;pointer-events:none;z-index:9997;mix-blend-mode:difference}
+  #cursor{position:fixed;top:0;left:0;width:12px;height:12px;border-radius:50%;background:#fff;
+    mix-blend-mode:difference;transform:translate(-50%,-50%);pointer-events:none;z-index:9999;
+    display:flex;align-items:center;justify-content:center;
+    transition:width .28s cubic-bezier(.2,.7,.2,1),height .28s cubic-bezier(.2,.7,.2,1),background .28s,border-color .28s,opacity .25s}
+  #cursor.hover{width:62px;height:62px;background:transparent;border:1.5px solid #fff}
+  #cursor.craft{mix-blend-mode:normal;width:74px;height:74px;background:rgba(22,18,13,.82);border:1px solid rgba(243,239,230,.35);backdrop-filter:blur(2px)}
+  #cursor.hide{opacity:0}
+  #cursor .ico{width:30px;height:30px;opacity:0;transform:scale(.5);transition:opacity .25s,transform .25s}
+  #cursor.craft .ico{opacity:1;transform:scale(1)}
+  #cursor .ico svg{width:30px;height:30px;fill:none;stroke:#f3efe6;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  @media(hover:none){#cursor-canvas,#cursor{display:none}}
+
+  /* ---- LOADER ---- */
+  #loader{position:fixed;inset:0;z-index:10000;background:var(--ink);color:var(--paper);display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity .6s,visibility .6s}
+  #loader.done{opacity:0;visibility:hidden}
+  #loader .lt{font-family:var(--serif);font-size:clamp(40px,9vw,120px);font-weight:300;letter-spacing:-.03em;overflow:hidden}
+  #loader .lt span{display:inline-block;transform:translateY(110%)}
+  #loader .bar{width:min(280px,60vw);height:2px;background:rgba(243,239,230,.2);margin-top:30px;overflow:hidden}
+  #loader .bar i{display:block;height:100%;width:0;background:var(--terra)}
+  #loader .pct{font-size:13px;letter-spacing:.3em;margin-top:14px;opacity:.6}
+
+  /* ---- NAV ---- */
+  header{position:fixed;top:0;left:0;right:0;z-index:500;mix-blend-mode:difference}
+  nav{display:flex;justify-content:space-between;align-items:center;padding:26px 32px;color:#fff}
+  .brand{font-family:var(--serif);font-size:23px;font-weight:500;letter-spacing:-.02em;display:flex;align-items:baseline;gap:7px}
+  .brand small{font-family:var(--sans);font-size:10px;letter-spacing:.32em;text-transform:uppercase;opacity:.7;font-weight:600}
+  .nav-right{display:flex;gap:30px;align-items:center;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+  .nav-right a{position:relative}
+  .nav-right a::after{content:'';position:absolute;left:0;bottom:-4px;height:1px;width:0;background:#fff;transition:width .3s}
+  .nav-right a:hover::after{width:100%}
+  @media(max-width:760px){.nav-right a:not(.nav-join){display:none}}
+
+  /* ---- FLOATING BOOK BUTTON ---- */
+  #bookFab{position:fixed;right:26px;bottom:26px;z-index:600;display:inline-flex;align-items:center;gap:10px;
+    background:var(--terra);color:#fff;border:none;font-family:var(--sans);font-weight:700;font-size:15px;
+    padding:15px 22px;border-radius:999px;box-shadow:0 12px 34px rgba(192,86,59,.4);transition:transform .2s,background .2s;will-change:transform}
+  #bookFab:hover{background:var(--terra-deep)}
+  #bookFab .pulse{width:9px;height:9px;border-radius:50%;background:#fff;position:relative}
+  #bookFab .pulse::after{content:'';position:absolute;inset:0;border-radius:50%;background:#fff;animation:pulse 1.8s infinite}
+  @keyframes pulse{0%{transform:scale(1);opacity:.7}100%{transform:scale(3.2);opacity:0}}
+  @media(max-width:560px){#bookFab{right:16px;bottom:16px;padding:13px 18px;font-size:14px}}
+
+  section{position:relative}
+  h1,h2,h3{line-height:1.05}
+
+  /* ---- HERO ---- */
+  .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px 0 80px;overflow:hidden;z-index:2}
+  .hero .eyebrow{display:flex;align-items:center;gap:14px;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:28px;font-weight:600}
+  .hero .eyebrow .ln{width:60px;height:1px;background:var(--ink-soft)}
+  .hero h1{font-family:var(--serif);font-weight:300;font-size:clamp(52px,11vw,180px);line-height:.92;letter-spacing:-.035em}
+  .hero h1 .row{display:block;overflow:hidden}
+  .hero h1 .row span{display:inline-block;transform:translateY(105%)}
+  .hero h1 em{font-style:italic;color:var(--terra)}
+  .hero-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:56px;flex-wrap:wrap;gap:30px}
+  .hero-foot p{max-width:420px;font-size:18px;line-height:1.55;color:var(--ink-soft)}
+  .hero-foot .scrollcue{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-soft);display:flex;align-items:center;gap:10px}
+  .hero-foot .scrollcue i{width:1px;height:46px;background:var(--ink-soft);position:relative;overflow:hidden;display:block}
+  .hero-foot .scrollcue i::after{content:'';position:absolute;inset:0;background:var(--terra);transform:translateY(-100%);animation:cue 1.8s infinite}
+  @keyframes cue{0%{transform:translateY(-100%)}60%,100%{transform:translateY(100%)}}
+  .hero-mark{position:absolute;right:-4%;top:18%;font-family:var(--serif);font-style:italic;font-size:clamp(120px,22vw,360px);color:var(--terra);opacity:.07;z-index:0;pointer-events:none;user-select:none}
+
+  /* ---- MANIFESTO ---- */
+  .manifesto{padding:18vh 0;z-index:2}
+  .manifesto p{font-family:var(--serif);font-weight:300;font-size:clamp(26px,4.4vw,62px);line-height:1.25;letter-spacing:-.02em;max-width:1100px}
+  .manifesto .word{display:inline-block;opacity:.12;transition:opacity .25s}
+  .manifesto .word.lit{opacity:1}
+  .manifesto .word em{font-style:italic;color:var(--terra)}
+
+  /* ---- MARQUEE ---- */
+  .marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:26px 0;overflow:hidden;white-space:nowrap;z-index:2}
+  .marquee .track{display:inline-flex;gap:48px;will-change:transform}
+  .marquee .track span{font-family:var(--serif);font-style:italic;font-size:clamp(28px,5vw,64px);font-weight:300}
+  .marquee .track .dot{color:var(--terra);font-style:normal}
+
+  /* ---- STITCH DIVIDER ---- */
+  .stitch{position:relative;height:130px;overflow:visible;z-index:3}
+  .stitch svg{width:100%;height:100%;display:block;overflow:visible}
+  .stitch .stitch-path{fill:none;stroke:var(--terra);stroke-width:2.5;stroke-dasharray:9 9;stroke-linecap:round}
+  .stitch .needle{position:absolute;top:0;left:0;width:34px;height:34px;transform:translate(-50%,-50%);transition:opacity .3s;filter:drop-shadow(0 3px 6px rgba(0,0,0,.2))}
+  .stitch .needle svg{width:34px;height:34px}
+  .stitch.on-dark .stitch-path{stroke:var(--terra)}
+
+  /* ---- COMMUNITY (scrollytelling + FLIP) ---- */
+  .community{background:var(--ink);color:var(--paper);position:relative;z-index:20}
+  .community .intro{padding:16vh 0 6vh;text-align:center}
+  .community .intro .k{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--terra);font-weight:600}
+  .community .intro h2{font-family:var(--serif);font-weight:300;font-size:clamp(34px,6vw,84px);line-height:1.05;letter-spacing:-.03em;margin-top:18px}
+  .community .intro h2 em{font-style:italic;color:var(--terra)}
+
+  .scrolly{position:relative}
+  .scrolly .sticky{position:sticky;top:0;height:100vh;display:flex;align-items:center;overflow:hidden;background:var(--ink)}
+  .stage{width:100%;max-width:1280px;margin:0 auto;padding:0 64px;display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
+  .stage.alt .txt{order:2;text-align:right}
+  .stage.alt .figure{order:1}
+  .stage.alt .meta{justify-content:flex-end}
+  .txt .idx{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--terra)}
+  .txt h3{font-family:var(--serif);font-weight:300;font-size:clamp(40px,6vw,88px);line-height:.98;letter-spacing:-.03em;margin:10px 0 18px}
+  .txt .role{font-size:13px;letter-spacing:.25em;text-transform:uppercase;color:rgba(243,239,230,.55);margin-bottom:22px;font-weight:600}
+  .txt p{font-size:18px;line-height:1.65;color:rgba(243,239,230,.78);max-width:460px}
+  .stage.alt .txt p{margin-left:auto}
+  .txt .meta{display:flex;gap:30px;margin-top:30px}
+  .txt .meta b{font-family:var(--serif);font-size:34px;font-weight:400;display:block}
+  .txt .meta span{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,239,230,.5)}
+
+  .figure{position:relative;height:80vh;display:flex;align-items:flex-end;justify-content:center}
+  .figure .bignum{position:absolute;top:-2%;left:50%;transform:translateX(-50%);font-family:var(--serif);font-size:clamp(180px,28vw,440px);font-weight:300;color:rgba(243,239,230,.06);z-index:0;line-height:1;user-select:none;pointer-events:none}
+  .figbody{position:relative;z-index:2;width:100%;height:92%;display:flex;align-items:flex-end;justify-content:center}
+  .figure .slot-note{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);z-index:3;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(243,239,230,.4);white-space:nowrap}
+  /* single photo */
+  .single{height:100%;display:flex;align-items:flex-end;justify-content:center}
+  .single .cutout{height:100%;width:auto;max-width:100%;object-fit:contain}
+  /* composite: two photos blended into one continuous visual */
+  .composite{width:100%;height:94%;display:flex;align-items:center;justify-content:center}
+  .composite .part{width:56%;height:100%;object-fit:cover}
+  .composite .part-r{margin-left:-9%}
+  /* tone-matching + background integration */
+  .cutout,.composite .part{filter:grayscale(100%) contrast(1.06) brightness(1.05);mix-blend-mode:luminosity;opacity:.9}
+  .cutout.mono,.composite .part.mono{filter:contrast(1.06) brightness(1.05)}      /* already B&W → skip grayscale */
+  .cutout.placeholder{filter:none;mix-blend-mode:normal;opacity:1}
+  .single .cutout{
+    -webkit-mask-image:radial-gradient(ellipse 80% 94% at 50% 46%, #000 50%, transparent 100%);
+    mask-image:radial-gradient(ellipse 80% 94% at 50% 46%, #000 50%, transparent 100%);}
+  .composite .part-l{
+    -webkit-mask-image:linear-gradient(to right,#000 52%,transparent 97%),radial-gradient(ellipse 92% 94% at 60% 46%,#000 54%,transparent 100%);
+    -webkit-mask-composite:source-in;
+    mask-image:linear-gradient(to right,#000 52%,transparent 97%),radial-gradient(ellipse 92% 94% at 60% 46%,#000 54%,transparent 100%);
+    mask-composite:intersect;}
+  .composite .part-r{
+    -webkit-mask-image:linear-gradient(to left,#000 52%,transparent 97%),radial-gradient(ellipse 92% 94% at 40% 46%,#000 54%,transparent 100%);
+    -webkit-mask-composite:source-in;
+    mask-image:linear-gradient(to left,#000 52%,transparent 97%),radial-gradient(ellipse 92% 94% at 40% 46%,#000 54%,transparent 100%);
+    mask-composite:intersect;}
+
+  .rail{position:absolute;left:32px;top:50%;transform:translateY(-50%);z-index:5;display:flex;align-items:center;gap:16px}
+  .rail b{font-family:var(--serif);font-size:11px;letter-spacing:.2em;color:rgba(243,239,230,.4);writing-mode:vertical-rl}
+  .rail .dots{display:flex;flex-direction:column;gap:9px}
+  .rail .dots i{width:7px;height:7px;border-radius:50%;background:rgba(243,239,230,.25);transition:all .3s}
+  .rail .dots i.on{background:var(--terra);transform:scale(1.6)}
+  @media(max-width:900px){.rail{display:none}.stage{padding:0 32px;gap:24px}.figure{height:54vh}.txt h3{font-size:42px}}
+
+  /* ---- IRON-GLIDING MASK REVEAL ---- */
+  .iron-reveal{background:var(--ink);color:var(--paper);padding:14vh 0 16vh;position:relative;z-index:20;overflow:hidden}
+  .ir-head{text-align:center;position:relative;margin-bottom:60px}
+  .ir-head .k{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--terra);font-weight:600}
+  .ir-head h2{font-family:var(--serif);font-weight:300;font-size:clamp(34px,6vw,80px);line-height:1.02;letter-spacing:-.03em;margin-top:14px}
+  .ir-head h2 em{font-style:italic;color:var(--terra)}
+  .steam-wrap{position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:200px;height:80px;pointer-events:none}
+  .steam{position:absolute;bottom:0;width:14px;height:42px;background:linear-gradient(to top,rgba(243,239,230,.55),transparent);border-radius:50%;filter:blur(5px);opacity:0;animation:rise 4.2s infinite ease-in}
+  @keyframes rise{0%{transform:translateY(10px) scaleX(1);opacity:0}25%{opacity:.7}100%{transform:translateY(-80px) translateX(14px) scaleX(.35);opacity:0}}
+  .ir-stage{max-width:1100px;margin:0 auto;height:60vh;position:relative;border-radius:6px;overflow:hidden}
+  .fabric{position:absolute;inset:0}
+  .fabric.wrinkled{background:
+      repeating-linear-gradient(115deg,rgba(0,0,0,.22) 0 6px,transparent 6px 16px),
+      repeating-linear-gradient(64deg,rgba(0,0,0,.16) 0 8px,transparent 8px 22px),
+      linear-gradient(135deg,#5a4a3a,#7a6a55 40%,#4a3d30);}
+  .fabric.smooth{background:linear-gradient(120deg,#c0563b,#e08a5a 45%,#b8492f);clip-path:inset(0 100% 0 0)}
+  .ir-stage .label{position:absolute;bottom:18px;z-index:4;font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:#fff;opacity:.85}
+  .ir-stage .label.l{left:22px}.ir-stage .label.r{right:22px}
+  .iron-glide{position:absolute;top:50%;left:0;z-index:6;width:84px;height:84px;transform:translate(-50%,-50%);transition:opacity .3s}
+  .iron-glide svg{width:84px;height:84px;fill:#16120d;stroke:#fff;stroke-width:1.2;filter:drop-shadow(0 8px 18px rgba(0,0,0,.45))}
+
+  /* ---- HOW (horizontal) ---- */
+  .how{padding:16vh 0 4vh;background:var(--paper);position:relative;z-index:1}
+  .how .head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:20px;margin-bottom:60px}
+  .how .head h2{font-family:var(--serif);font-weight:300;font-size:clamp(34px,6vw,76px);line-height:1;letter-spacing:-.03em}
+  .how .head p{max-width:340px;color:var(--ink-soft);font-size:16px}
+  .htrack-wrap{overflow:hidden}
+  .htrack{display:flex;gap:30px;will-change:transform;padding-bottom:60px}
+  .hcard{flex:0 0 380px;border:1px solid var(--line);border-radius:4px;padding:36px;min-height:360px;display:flex;flex-direction:column;justify-content:space-between;background:var(--paper-2)}
+  .hcard .n{font-family:var(--serif);font-style:italic;font-size:60px;font-weight:300;color:var(--terra)}
+  .hcard h3{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.05;margin:20px 0 12px}
+  .hcard p{color:var(--ink-soft);font-size:16px;line-height:1.55}
+
+  /* ---- FEATURES ---- */
+  .feats{padding:10vh 0 14vh;background:var(--paper);position:relative;z-index:1}
+  .feats .head{margin-bottom:54px;max-width:760px}
+  .feats .head .k{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--terra);font-weight:600}
+  .feats .head h2{font-family:var(--serif);font-weight:300;font-size:clamp(32px,5vw,68px);line-height:1.05;letter-spacing:-.02em;margin-top:16px}
+  .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+  .fcell{background:var(--paper);padding:40px 34px;min-height:240px;display:flex;flex-direction:column;justify-content:space-between;transition:background .3s}
+  .fcell:hover{background:var(--paper-2)}
+  .fcell .ic{font-size:30px}
+  .fcell h3{font-family:var(--serif);font-weight:400;font-size:26px;margin-bottom:10px}
+  .fcell p{color:var(--ink-soft);font-size:15.5px;line-height:1.55}
+  @media(max-width:860px){.fgrid{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.fgrid{grid-template-columns:1fr}}
+
+  /* reveal + wrinkle utils */
+  .reveal{opacity:0;transform:translateY(40px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+  .wrinkle{will-change:filter,transform}
+
+  /* ---- JOIN ---- */
+  .join{background:var(--ink);color:var(--paper);padding:16vh 0;position:relative;z-index:20}
+  .join .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:60px;align-items:center}
+  .join .lead .k{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--terra);font-weight:600}
+  .join .lead h2{font-family:var(--serif);font-weight:300;font-size:clamp(38px,5.5vw,82px);line-height:1;letter-spacing:-.03em;margin:18px 0 22px}
+  .join .lead h2 em{font-style:italic;color:var(--terra)}
+  .join .lead p{color:rgba(243,239,230,.72);font-size:18px;line-height:1.6;max-width:420px}
+  @media(max-width:860px){.join .grid{grid-template-columns:1fr;gap:36px}}
+
+  /* ---- SHARED FORM / CARD ---- */
+  .signup-card{background:var(--paper);color:var(--ink);border-radius:6px;padding:34px}
+  .role-toggle{display:flex;gap:6px;background:var(--paper-2);padding:5px;border-radius:6px;margin-bottom:24px}
+  .role-toggle .role{flex:1;border:none;background:none;font-family:var(--sans);font-weight:700;font-size:13.5px;padding:12px;border-radius:4px;color:var(--ink-soft);transition:all .2s}
+  .role-toggle .role.on{background:var(--ink);color:var(--paper)}
+  .field{margin-bottom:16px}
+  .field-row{display:flex;gap:14px}
+  .field-row .field{flex:1}
+  .field label{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:7px}
+  .field input,.field select{width:100%;border:1px solid var(--line);border-radius:4px;padding:13px 14px;font-size:15px;font-family:var(--sans);color:var(--ink);background:#fff;transition:border .15s,box-shadow .15s}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--terra);box-shadow:0 0 0 3px rgba(192,86,59,.14)}
+  .field input.invalid{border-color:var(--terra)}
+  .phone-input{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:#fff;transition:border .15s,box-shadow .15s}
+  .phone-input:focus-within{border-color:var(--terra);box-shadow:0 0 0 3px rgba(192,86,59,.14)}
+  .phone-input .cc{display:flex;align-items:center;padding:0 13px;background:var(--paper-2);font-weight:700;font-size:14px;border-right:1px solid var(--line)}
+  .phone-input input{border:none}.phone-input input:focus{box-shadow:none}
+  .err{color:var(--terra-deep);font-size:12.5px;font-weight:600;margin-top:6px;display:block}
+  .submit-btn{width:100%;justify-content:center;display:inline-flex;align-items:center;gap:8px;border:none;cursor:pointer;font-family:var(--sans);font-weight:700;font-size:15px;padding:15px;border-radius:4px;background:var(--terra);color:#fff;margin-top:6px;transition:background .2s}
+  .submit-btn:hover{background:var(--terra-deep)}
+  .signup-card .note{color:var(--ink-soft);text-align:center;margin-top:14px;font-size:13px}
+  .signup-card .note a{color:var(--terra-deep);font-weight:700}
+  .otp-head{text-align:center;margin-bottom:22px}
+  .otp-head h3{font-family:var(--serif);font-weight:400;font-size:26px}
+  .otp-head p{color:var(--ink-soft);font-size:14px;margin-top:8px}
+  .otp-head a{color:var(--terra-deep);font-weight:700}
+  .otp-boxes{display:flex;gap:10px;justify-content:center;margin-bottom:14px}
+  .otp-boxes input{width:48px;height:56px;text-align:center;font-size:24px;font-weight:800;border:1px solid var(--line);border-radius:6px;font-family:var(--sans)}
+  .otp-boxes input:focus{outline:none;border-color:var(--terra);box-shadow:0 0 0 3px rgba(192,86,59,.14)}
+  .demo-hint{text-align:center;font-size:13px;color:var(--terra-deep);background:rgba(192,86,59,.08);border-radius:6px;padding:9px;margin-bottom:14px;font-weight:600}
+  .success-state{text-align:center;padding:18px 10px}
+  .success-state .check{width:64px;height:64px;border-radius:50%;background:var(--terra);color:#fff;font-size:32px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+  .success-state h3{font-family:var(--serif);font-weight:400;font-size:26px}
+  .success-state p{color:var(--ink-soft);margin-top:10px;font-size:15px}
+  @media(max-width:520px){.field-row{flex-direction:column;gap:0}.otp-boxes input{width:42px;height:50px;font-size:20px}}
+
+  /* ---- FOOTER ---- */
+  footer{background:var(--ink);color:var(--paper);padding:0 0 40px;position:relative;z-index:20}
+  .foot-marq{overflow:hidden;border-top:1px solid rgba(243,239,230,.14);padding:40px 0}
+  .foot-marq .track{display:inline-flex;white-space:nowrap;will-change:transform}
+  .foot-marq .track span{font-family:var(--serif);font-style:italic;font-weight:300;font-size:clamp(60px,12vw,160px);padding:0 40px;opacity:.9}
+  .foot-bottom{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;color:rgba(243,239,230,.55);font-size:13px;padding-top:30px}
+  .foot-bottom a{color:rgba(243,239,230,.8)}
+
+  /* ---- BOOKING OVERLAY ---- */
+  #booking{position:fixed;inset:0;z-index:1000;background:var(--paper);color:var(--ink);overflow-y:auto;
+    opacity:0;visibility:hidden;transform:translateY(20px);transition:opacity .4s,visibility .4s,transform .4s}
+  #booking.open{opacity:1;visibility:visible;transform:none}
+  .bk-top{position:sticky;top:0;background:var(--paper);border-bottom:1px solid var(--line);z-index:5;
+    display:flex;justify-content:space-between;align-items:center;padding:20px 32px}
+  .bk-top .t{font-family:var(--serif);font-size:24px;font-weight:500}
+  .bk-close{background:none;border:1px solid var(--line);border-radius:999px;padding:10px 18px;font-family:var(--sans);font-weight:700;font-size:14px;cursor:pointer;display:flex;gap:8px;align-items:center}
+  .bk-close:hover{background:var(--paper-2)}
+  .bk-body{max-width:1100px;margin:0 auto;padding:34px 32px 80px}
+  .bk-loc{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:26px}
+  .bk-loc .field{margin:0;flex:1;min-width:220px}
+  .bk-section-label{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 12px}
+  .chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 16px;font-family:var(--sans);font-weight:600;font-size:14px;cursor:pointer;transition:all .2s}
+  .chip:hover{border-color:var(--terra)}
+  .chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .time-toggle{display:inline-flex;gap:4px;background:var(--paper-2);padding:5px;border-radius:8px;margin-bottom:30px}
+  .time-toggle button{border:none;background:none;font-family:var(--sans);font-weight:700;font-size:14px;padding:11px 20px;border-radius:5px;cursor:pointer;color:var(--ink-soft);transition:all .2s}
+  .time-toggle button.on{background:#fff;color:var(--ink);box-shadow:0 3px 10px rgba(22,18,13,.1)}
+  .time-toggle button .sub{display:block;font-size:11px;font-weight:600;opacity:.6;text-transform:none;letter-spacing:0}
+  .bk-count{font-size:14px;color:var(--ink-soft);margin-bottom:18px}
+  .bk-count b{color:var(--ink)}
+  .provider-list{display:grid;gap:14px}
+  .provider{display:flex;justify-content:space-between;align-items:center;gap:20px;border:1px solid var(--line);border-radius:8px;padding:22px 24px;background:#fff;transition:border .2s,transform .2s}
+  .provider:hover{border-color:var(--terra);transform:translateY(-2px)}
+  .provider .pinfo h4{font-family:var(--serif);font-weight:500;font-size:22px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .provider .pinfo h4 .exp{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--terra);background:rgba(192,86,59,.12);padding:3px 8px;border-radius:5px}
+  .provider .pinfo .meta{font-size:13.5px;color:var(--ink-soft);margin-top:6px;display:flex;gap:14px;flex-wrap:wrap}
+  .provider .pinfo .tags{margin-top:10px;display:flex;gap:7px;flex-wrap:wrap}
+  .provider .pinfo .tags span{font-size:11px;font-weight:600;background:var(--paper-2);padding:4px 9px;border-radius:5px;color:var(--ink-soft)}
+  .provider .pright{text-align:right;flex-shrink:0}
+  .provider .pright .price{font-family:var(--serif);font-size:28px;font-weight:500}
+  .provider .pright .price small{font-family:var(--sans);font-size:12px;color:var(--ink-soft);font-weight:600}
+  .provider .pright .pick{margin-top:10px;border:none;background:var(--terra);color:#fff;font-family:var(--sans);font-weight:700;font-size:13px;padding:10px 18px;border-radius:6px;cursor:pointer;transition:background .2s}
+  .provider .pright .pick:hover{background:var(--terra-deep)}
+  .provider .pright .pick.done{background:#3c7d4f}
+  .bk-empty{text-align:center;color:var(--ink-soft);padding:50px;font-size:16px}
+  @media(max-width:620px){.provider{flex-direction:column;align-items:flex-start}.provider .pright{text-align:left}}
+</style>
+</head>
+<body>
+
+<!-- SVG filter defs for ripple/displacement -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="ripple" x="-20%" y="-20%" width="140%" height="140%">
+    <feTurbulence id="rippleTurb" type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="4" result="noise"/>
+    <feDisplacementMap id="rippleDisp" in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</defs></svg>
+
+<canvas id="cursor-canvas"></canvas>
+<div id="cursor"><span class="ico"></span></div>
+
+<!-- LOADER -->
+<div id="loader"><div class="lt" id="loaderText"></div><div class="bar"><i></i></div><div class="pct">0%</div></div>
+
+<!-- FLOATING BOOK NOW -->
+<button id="bookFab" data-magnetic data-cursor><span class="pulse"></span> Book Now</button>
+
+<!-- NAV -->
+<header>
+  <nav>
+    <a href="#top" class="brand" data-cursor>Project&nbsp;dhoB <small>cloth · craft · community</small></a>
+    <div class="nav-right">
+      <a href="#community" data-cursor>The Community</a>
+      <a href="#how" data-cursor>How it works</a>
+      <a href="#features" data-cursor>What we do</a>
+      <a href="#join" class="nav-join" data-cursor>Join →</a>
+    </div>
+  </nav>
+</header>
+
+<main id="top">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-mark">dhoB</div>
+  <div class="wrap">
+    <div class="eyebrow reveal"><span class="ln"></span> Est. 2026 · India</div>
+    <h1>
+      <span class="row"><span>The hands</span></span>
+      <span class="row"><span>behind your <em>cloth.</em></span></span>
+    </h1>
+    <div class="hero-foot">
+      <p class="reveal">Project dhoB is a living community of the people who wash, press, stitch, embroider, mend and revive the fabric of everyday life — brought together, and brought to your door.</p>
+      <div class="scrollcue reveal">Scroll to meet them <i></i></div>
+    </div>
+  </div>
+</section>
+
+<!-- MANIFESTO -->
+<section class="manifesto">
+  <div class="wrap">
+    <p id="manifesto">Behind every clean shirt, every fallen hem set right, every saree given its <em>fall and pico</em>, there is a pair of hands and a lifetime of craft. We are building the place where those hands are seen, valued, and just one tap away.</p>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="track" id="marquee1">
+    <span>Dhobis<span class="dot"> ✦ </span></span><span>Tailors<span class="dot"> ✦ </span></span><span>Embroiderers<span class="dot"> ✦ </span></span><span>Cobblers<span class="dot"> ✦ </span></span><span>Rafoogars<span class="dot"> ✦ </span></span><span>Istriwalas<span class="dot"> ✦ </span></span>
+    <span>Dhobis<span class="dot"> ✦ </span></span><span>Tailors<span class="dot"> ✦ </span></span><span>Embroiderers<span class="dot"> ✦ </span></span><span>Cobblers<span class="dot"> ✦ </span></span><span>Rafoogars<span class="dot"> ✦ </span></span><span>Istriwalas<span class="dot"> ✦ </span></span>
+  </div>
+</div>
+
+<!-- STITCH DIVIDER -->
+<div class="stitch" data-stitch></div>
+
+<!-- COMMUNITY -->
+<section class="community" id="community">
+  <div class="intro">
+    <div class="wrap">
+      <div class="k reveal">The Community</div>
+      <h2 class="wrinkle">One platform. <em>Many crafts.</em><br/>The people who make cloth live.</h2>
+    </div>
+  </div>
+  <div class="scrolly" id="scrolly">
+    <div class="sticky">
+      <div class="rail"><b>THE&nbsp;COMMUNITY</b><div class="dots" id="railDots"></div></div>
+      <div class="stage" id="stage">
+        <div class="txt" id="txt">
+          <div class="idx" id="cIdx"></div>
+          <h3 id="cName"></h3>
+          <div class="role" id="cRole"></div>
+          <p id="cDesc"></p>
+          <div class="meta"><div><b id="cA"></b><span id="cAL"></span></div><div><b id="cB"></b><span id="cBL"></span></div></div>
+        </div>
+        <div class="figure" id="figure">
+          <div class="bignum" id="cNum"></div>
+          <div class="figbody" id="cBody"></div>
+          <div class="slot-note" id="cNote"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IRON-GLIDING MASK REVEAL -->
+<section class="iron-reveal">
+  <div class="wrap">
+    <div class="ir-head">
+      <div class="steam-wrap" id="steamWrap"></div>
+      <div class="k">The finish</div>
+      <h2 class="wrinkle">From wrinkled<br/>to <em>flawless.</em></h2>
+    </div>
+  </div>
+  <div class="ir-stage" id="irStage">
+    <div class="fabric wrinkled displace"></div>
+    <div class="fabric smooth" id="smoothLayer"></div>
+    <span class="label l">Wrinkled</span>
+    <span class="label r">Pressed</span>
+    <div class="iron-glide" id="ironGlide"></div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="head"><h2 class="wrinkle">How it<br/>comes together</h2><p>From a tap on your phone to fresh, finished cloth — and fair work for the community.</p></div>
+  </div>
+  <div class="wrap htrack-wrap">
+    <div class="htrack" id="htrack">
+      <div class="hcard"><div class="n">01</div><div><h3>Tell us the need</h3><p>Wash, iron, dry clean, a falling hem, an invisible darn, an embroidered blouse — describe it, urgent or not.</p></div></div>
+      <div class="hcard"><div class="n">02</div><div><h3>Meet your makers</h3><p>See the nearest artisans for that craft — their work, ratings and transparent prices, side by side.</p></div></div>
+      <div class="hcard"><div class="n">03</div><div><h3>Agree &amp; we collect</h3><p>Pick a maker or post a price. A dhoB rider picks up from your door at the slot you choose.</p></div></div>
+      <div class="hcard"><div class="n">04</div><div><h3>Crafted &amp; returned</h3><p>Back in 24–48 hours — or 3–4 on express. Done by a real person you can rate, thank and return to.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- STITCH DIVIDER -->
+<div class="stitch" data-stitch></div>
+
+<!-- FEATURES -->
+<section class="feats" id="features">
+  <div class="wrap">
+    <div class="head"><div class="k">What we do</div><h2 class="wrinkle">Every craft of cloth, in one community</h2></div>
+    <div class="fgrid">
+      <div class="fcell reveal"><div class="ic">🧺</div><div><h3>Wash &amp; press</h3><p>Everyday laundry, ironing and folding by trusted neighbourhood dhobis and istriwalas.</p></div></div>
+      <div class="fcell reveal"><div class="ic">🧵</div><div><h3>Stitch &amp; tailor</h3><p>Alterations, repairs and bespoke tailoring from local darzis who know how cloth should fall.</p></div></div>
+      <div class="fcell reveal"><div class="ic">🪡</div><div><h3>Embroidery</h3><p>Zardozi, chikankari and hand embroidery — heritage needlework for your most special pieces.</p></div></div>
+      <div class="fcell reveal"><div class="ic">👞</div><div><h3>Shoe &amp; leather</h3><p>The mochi's craft — resoling, polishing and reviving shoes, bags and leather goods.</p></div></div>
+      <div class="fcell reveal"><div class="ic">⚡</div><div><h3>Express, when urgent</h3><p>Interview at 9, crease at 6? Post it, agree a price, get it back in 3–4 hours.</p></div></div>
+      <div class="fcell reveal"><div class="ic">🏬</div><div><h3>dhoB Atelier</h3><p>Our own studios for guaranteed, premium results on delicate and treasured pieces.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- JOIN -->
+<section class="join" id="join">
+  <div class="wrap">
+    <div class="grid">
+      <div class="lead">
+        <div class="k reveal">Be part of it</div>
+        <h2 class="wrinkle">Join the <em>community.</em></h2>
+        <p class="reveal">Whether you need a craft done or you <b>are</b> the craft — Project dhoB is launching city by city. Verify your number and we'll bring you in first.</p>
+      </div>
+      <div class="signup-card reveal">
+        <form id="detailsForm" novalidate>
+          <div class="role-toggle">
+            <button type="button" class="role on" data-role="customer" data-cursor data-magnetic>I need a craft</button>
+            <button type="button" class="role" data-role="artisan" data-cursor data-magnetic>I am an artisan</button>
+          </div>
+          <div class="field"><label for="name">Full name</label><input type="text" id="name" placeholder="e.g. Aarav Sharma" autocomplete="name" /><small class="err" data-for="name"></small></div>
+          <div class="field-row">
+            <div class="field"><label for="email">Email</label><input type="email" id="email" placeholder="you@email.com" autocomplete="email" /><small class="err" data-for="email"></small></div>
+            <div class="field"><label for="city">City</label><input type="text" id="city" placeholder="e.g. Bengaluru" autocomplete="address-level2" /><small class="err" data-for="city"></small></div>
+          </div>
+          <div class="field" id="craftField" style="display:none">
+            <label for="craft">Your craft</label>
+            <select id="craft"><option value="">Select your craft</option><option>Dhobi / Laundry</option><option>Istriwala / Pressing</option><option>Tailor / Darzi</option><option>Fall &amp; Pico</option><option>Rafoogar / Darning</option><option>Embroiderer (Zardozi/Chikankari)</option><option>Mochi / Shoe &amp; leather</option><option>Carpet &amp; upholstery</option><option>Wool &amp; shawl</option><option>Sneaker care</option><option>Bag repair</option><option>Other cloth craft</option></select>
+            <small class="err" data-for="craft"></small>
+          </div>
+          <div class="field"><label for="phone">Phone number</label><div class="phone-input"><span class="cc">🇮🇳 +91</span><input type="tel" id="phone" placeholder="10-digit mobile" maxlength="10" autocomplete="tel" /></div><small class="err" data-for="phone"></small></div>
+          <button type="submit" class="submit-btn" data-cursor data-magnetic>Send verification code →</button>
+          <div class="note">We'll text you a 6-digit code to confirm it's really you.</div>
+        </form>
+        <form id="otpForm" style="display:none">
+          <div class="otp-head"><h3>Verify your number</h3><p>Enter the code sent to <b id="otpPhone">+91 •••••</b>. <a href="#" id="editPhone" data-cursor>Edit</a></p></div>
+          <div class="otp-boxes" id="otpBoxes"><input inputmode="numeric" maxlength="1" /><input inputmode="numeric" maxlength="1" /><input inputmode="numeric" maxlength="1" /><input inputmode="numeric" maxlength="1" /><input inputmode="numeric" maxlength="1" /><input inputmode="numeric" maxlength="1" /></div>
+          <div class="demo-hint" id="demoHint"></div>
+          <small class="err" data-for="otp" style="text-align:center"></small>
+          <button type="submit" class="submit-btn" data-cursor data-magnetic>Verify &amp; join →</button>
+          <div class="note">Didn't get it? <a href="#" id="resendOtp" data-cursor>Resend code</a></div>
+        </form>
+        <div class="success-state" id="successState" style="display:none"><div class="check">✓</div><h3>You're in. 🎉</h3><p id="successMsg">Welcome to the community.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="foot-marq"><div class="track" id="footMarq"><span>Project dhoB —</span><span>Project dhoB —</span><span>Project dhoB —</span></div></div>
+  <div class="wrap"><div class="foot-bottom"><span>© 2026 Project dhoB · A community of cloth &amp; craft</span><span><a href="mailto:hello@projectdhob.com" data-cursor>hello@projectdhob.com</a> · Instagram · LinkedIn</span></div></div>
+</footer>
+
+<!-- BOOKING OVERLAY -->
+<div id="booking">
+  <div class="bk-top">
+    <span class="t">Book a craft</span>
+    <button class="bk-close" id="bkClose" data-cursor data-magnetic>Close ✕</button>
+  </div>
+  <div class="bk-body">
+    <div class="bk-loc">
+      <div class="field"><label for="bkLocation">Your location</label><input type="text" id="bkLocation" placeholder="Area, landmark or pincode — e.g. Indiranagar, 560038" /></div>
+    </div>
+    <p class="bk-section-label">What do you need?</p>
+    <div class="chips" id="serviceChips"></div>
+    <p class="bk-section-label">How soon?</p>
+    <div class="time-toggle" id="timeToggle">
+      <button data-time="standard" class="on" data-cursor>Standard<span class="sub">24–48 hours</span></button>
+      <button data-time="express" data-cursor>Express<span class="sub">3–4 hours</span></button>
+    </div>
+    <div class="bk-count" id="bkCount"></div>
+    <div class="provider-list" id="providerList"></div>
+  </div>
+</div>
+
+<!-- libraries -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Flip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+<script>
+/* ============================== ICONS ============================== */
+var ICONS = {
+  drop:'<svg viewBox="0 0 24 24"><path d="M12 3c4 5 6 7.5 6 10a6 6 0 1 1-12 0c0-2.5 2-5 6-10z"/></svg>',
+  iron:'<svg viewBox="0 0 24 24"><path d="M3 16h13a4 4 0 0 0 0-8H8L3 16z"/><path d="M3 19h16"/></svg>',
+  scissors:'<svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.4"/><circle cx="6" cy="18" r="2.4"/><path d="M8 7.5l12 9M8 16.5l12-9"/></svg>',
+  needle:'<svg viewBox="0 0 24 24"><path d="M3 21L20 4"/><path d="M15 4h5v5"/><circle cx="6.5" cy="17.5" r="1.6"/></svg>',
+  hoop:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4" stroke-dasharray="2 2"/></svg>',
+  shoe:'<svg viewBox="0 0 24 24"><path d="M3 9v5h15a2 2 0 0 0 2-2c0-2-3-2.5-5.5-4C12 6.5 11 6 9 6H3z"/><path d="M3 14h16"/></svg>',
+  brush:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="13" height="6" rx="1.2"/><path d="M6 10v9M10 10v9M14 10v9"/></svg>',
+  yarn:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M6 9c4 2.5 8 4.5 11.5 7M9 4.5c1 5.5 2.5 10 4.5 14.5"/></svg>',
+  sneaker:'<svg viewBox="0 0 24 24"><path d="M2 16h13l5-2c1-3-2.5-3.8-5-5l-2.5 2.5L10 7l-3 5H2z"/><path d="M2 16h18"/></svg>',
+  bag:'<svg viewBox="0 0 24 24"><path d="M5 8h14l-1.2 12H6.2L5 8z"/><path d="M8.5 8a3.5 3.5 0 0 1 7 0"/></svg>'
+};
+
+/* ============================== COMMUNITY DATA ============================== */
+/* Drop a transparent-background photo path into `photo` to replace the placeholder figure. */
+var CRAFTS = [
+  {idx:'01',num:'I',  name:'The Dhobi',     role:'Washing & care',     icon:'drop',
+   desc:'Before sunrise, by the ghat or the rooftop tank, the dhobi reads cloth like a language — what can be beaten, what must be coaxed. Generations of care in every fold returned to you.',
+   a:'4am',al:'Day begins',b:'24h',bl:'Back to you',color:'#7aa0c4',photos:['dhobi-1.jpg','dhobi-2.jpg'],mono:[false,true]},
+  {idx:'02',num:'II', name:'The Istriwala', role:'Pressing & finish',   icon:'iron',
+   desc:'A coal iron, heavy and certain. The istriwala turns crumpled into crisp with a hiss of steam and a practised wrist — the last, sharpest word a garment speaks.',
+   a:'500°',al:'Coal-iron heat',b:'0',bl:'Creases left',color:'#c0563b',photos:['istriwala-1.jpg','istriwala-2.jpg'],mono:[false,false]},
+  {idx:'03',num:'III',name:'The Darzi',      role:'Tailoring & stitch',  icon:'scissors',
+   desc:'Chalk, tape, and an eye that measures more than inches. The darzi makes cloth obey the body — a hem set right, a seam reborn, a fit that finally feels like yours.',
+   a:'1mm',al:'Margin of error',b:'∞',bl:'Alterations',color:'#5a7d5a',photos:['darzi-1.jpg','darzi-2.jpg'],mono:[true,false]},
+  {idx:'04',num:'IV', name:'Fall & Pico',    role:'Saree finishing',     icon:'needle',
+   desc:'The quiet artisans of the saree — attaching the fall so it drapes, picoing the edge so it never frays. Invisible work that lets six yards move like water.',
+   a:'6 yd',al:'Of silk',b:'1',bl:'Perfect drape',color:'#b07aa1',photos:['fall-pico.jpg'],mono:[false]},
+  {idx:'05',num:'V',  name:'The Rafoogar',   role:'Invisible mending',   icon:'needle',
+   desc:'Thread by thread, the rafoogar re-weaves what was lost — a moth-hole, a tear, a burn — until the wound in the weave simply disappears. Memory, repaired.',
+   a:'200+',al:'Stitches/inch',b:'0',bl:'Trace left',color:'#c79a4b',photos:['rafoogar-1.jpg','rafoogar-2.jpg'],mono:[false,false]},
+  {idx:'06',num:'VI', name:'The Embroiderer',role:'Zardozi & chikankari',icon:'hoop',
+   desc:'Hoop drawn tight, needle dipping like a bird — zardozi gold, chikankari shadow-work, threadwork that turns plain cloth into heirloom. Patience measured in months.',
+   a:'30k',al:'Stitches / motif',b:'1',bl:'Of a kind',color:'#a06c2c',photos:['embroiderer.jpg'],mono:[false]},
+  {idx:'07',num:'VII',name:'The Mochi',      role:'Shoe & leather repair',icon:'shoe',
+   desc:'At the corner with awl and wax thread, the mochi gives shoes a second life — resoled, restitched, polished to a shine that outlasts the day you bought them.',
+   a:'2nd',al:'Life for soles',b:'48h',bl:'Like-new',color:'#8a5a3c',photos:['mochi.jpg'],mono:[false]},
+  {idx:'08',num:'VIII',name:'Carpet & Upholstery',role:'Deep cleaning',  icon:'brush',
+   desc:'The big, heavy, forgotten things — rugs, mattresses, sofas, durries that hold a year of footsteps. Beaten, washed, steam-cleaned and sun-dried back to life.',
+   a:'12kg',al:'Lifted by hand',b:'1 day',bl:'Sun-dried',color:'#6b8e8e',photos:['carpet.jpg'],mono:[false]},
+  {idx:'09',num:'IX', name:'Wool & Shawl',   role:'Mending & care',      icon:'yarn',
+   desc:'For pashmina, wool and the shawl passed down a generation — gentle hands that mend a pull, refelt a hole, and store winter away soft and moth-free.',
+   a:'-5°',al:'Made for cold',b:'∞',bl:'Winters',color:'#9a8fb0',photos:['wool-1.jpg','wool-2.jpg'],mono:[false,false]},
+  {idx:'10',num:'X',  name:'Sneaker Care',   role:'Cleaning & restore',  icon:'sneaker',
+   desc:'Midsoles whitened, uppers deep-cleaned, creases eased — the sneakerhead\'s ritual, done right. Your grails back to box-fresh, without the risk.',
+   a:'1:1',al:'Box-fresh',b:'72h',bl:'Turnaround',color:'#4f6dba',photos:['sneaker.jpg'],mono:[false]},
+  {idx:'11',num:'XI', name:'Bag Repair',     role:'Restore & revive',    icon:'bag',
+   desc:'Zips replaced, handles re-stitched, leather fed and edges re-painted — the specialists who bring a tired everyday bag, or a treasured one, back to its best.',
+   a:'1',al:'Loved again',b:'5d',bl:'Full revive',color:'#7d5a4a',photos:['bag-repair.jpg'],mono:[false]}
+];
+
+function figureSVG(color){
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 620">'
+    + '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+color+'"/><stop offset="1" stop-color="#16120d"/></linearGradient></defs>'
+    + '<g fill="url(%23g)">'
+    + '<ellipse cx="150" cy="92" rx="46" ry="50"/>'
+    + '<path d="M104 150 q46 30 92 0 l24 70 -30 18 6 250 -50 8 -14-150 -14 150 -50-8 6-250 -30-18z"/>'
+    + '<rect x="60" y="150" width="26" height="170" rx="13" transform="rotate(14 73 235)"/>'
+    + '<rect x="214" y="150" width="26" height="170" rx="13" transform="rotate(-14 227 235)"/>'
+    + '</g></svg>');
+}
+
+/* ============================== LOADER ============================== */
+(function(){
+  var txt=document.getElementById('loaderText');
+  'dhoB'.split('').forEach(function(ch){var s=document.createElement('span');s.textContent=ch;txt.appendChild(s);});
+  var spans=txt.querySelectorAll('span'), ld=document.getElementById('loader'),
+      bar=ld.querySelector('.bar i'), pct=ld.querySelector('.pct'), p=0;
+  if(window.gsap) gsap.to(spans,{y:0,duration:.7,stagger:.07,ease:'power3.out',delay:.1});
+  var t=setInterval(function(){
+    p+=Math.max(1,Math.round((100-p)*0.18));
+    if(p>=100){p=100;clearInterval(t);setTimeout(done,350);}
+    bar.style.width=p+'%';pct.textContent=p+'%';
+  },90);
+  function done(){ld.classList.add('done');startReveals();}
+  setTimeout(function(){if(!ld.classList.contains('done')){ld.classList.add('done');startReveals();}},3500);
+})();
+
+/* ============================== SMOOTH SCROLL ============================== */
+var lenis;
+if(window.Lenis){
+  lenis=new Lenis({lerp:0.09});
+  function raf(t){lenis.raf(t);requestAnimationFrame(raf);}requestAnimationFrame(raf);
+  if(window.ScrollTrigger) lenis.on('scroll',ScrollTrigger.update);
+}
+document.querySelectorAll('a[href^="#"]').forEach(function(a){
+  a.addEventListener('click',function(e){
+    var id=a.getAttribute('href');if(id==='#')return;var el=document.querySelector(id);if(!el)return;
+    e.preventDefault(); if(lenis)lenis.scrollTo(el);else el.scrollIntoView({behavior:'smooth'});
+  });
+});
+
+/* ============================== REVEALS ============================== */
+function startReveals(){
+  if(window.gsap) gsap.to('.hero h1 .row span',{y:0,duration:1.1,stagger:.12,ease:'power4.out'});
+  var obs=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');obs.unobserve(en.target);}});},{threshold:.18});
+  document.querySelectorAll('.reveal').forEach(function(el){obs.observe(el);});
+}
+
+/* ============================== COMMUNITY (FLIP scrollytelling) ============================== */
+var activeCraftIcon=null, inCraftZone=false;
+(function(){
+  var stage=document.getElementById('stage');
+  var dots=document.getElementById('railDots');
+  CRAFTS.forEach(function(c,i){var d=document.createElement('i');if(i===0)d.className='on';dots.appendChild(d);});
+  var dotEls=dots.querySelectorAll('i');
+  var els={idx:cIdx,name:cName,role:cRole,desc:cDesc,a:cA,al:cAL,b:cB,bl:cBL,num:cNum,body:cBody,note:cNote};
+  var figure=document.getElementById('figure'), txt=document.getElementById('txt');
+  var PHOTO_BASE='images/community/';
+  var current=-1;
+
+  function buildFigure(c){
+    if(!c.photos || !c.photos.length){
+      return '<div class="single"><img class="cutout placeholder" src="'+figureSVG(c.color)+'" alt="'+c.name+'"/></div>';
+    }
+    function cls(i){return 'cutout'+(c.mono && c.mono[i]?' mono':'');}
+    if(c.photos.length===1){
+      return '<div class="single"><img class="'+cls(0)+'" src="'+PHOTO_BASE+c.photos[0]+'" alt="'+c.name+'"/></div>';
+    }
+    // composite: two photos overlapped + gradient-masked + tone-matched into one visual
+    return '<div class="composite">'
+      +'<img class="part part-l'+(c.mono&&c.mono[0]?' mono':'')+'" src="'+PHOTO_BASE+c.photos[0]+'" alt="'+c.name+'"/>'
+      +'<img class="part part-r'+(c.mono&&c.mono[1]?' mono':'')+'" src="'+PHOTO_BASE+c.photos[1]+'" alt="'+c.name+'"/>'
+      +'</div>';
+  }
+
+  function render(i){
+    var c=CRAFTS[i];
+    els.idx.textContent='— '+c.idx; els.name.textContent=c.name; els.role.textContent=c.role;
+    els.desc.textContent=c.desc; els.a.textContent=c.a; els.al.textContent=c.al;
+    els.b.textContent=c.b; els.bl.textContent=c.bl; els.num.textContent=c.num;
+    els.body.innerHTML=buildFigure(c);
+    els.note.textContent=(c.photos && c.photos.length)?'':'◊ photo slot — real cutout drops in here';
+  }
+
+  function show(i){
+    if(i===current) return;
+    var c=CRAFTS[i];
+    var useFlip = window.Flip && current!==-1;
+    var state = useFlip ? Flip.getState([figure,txt],{props:'opacity'}) : null;
+
+    render(i);
+    stage.classList.toggle('alt', i%2===1);   // swap sides → shared elements morph
+    activeCraftIcon=c.icon; updateCursorIcon();
+
+    if(useFlip){
+      Flip.from(state,{duration:.7,ease:'power3.inOut',absolute:true});
+      if(window.gsap){
+        gsap.fromTo(els.body,{opacity:0,y:34,scale:1.04},{opacity:1,y:0,scale:1,duration:.7,ease:'power3.out'});
+        gsap.fromTo([els.name,els.desc],{y:22,opacity:0},{y:0,opacity:1,duration:.55,stagger:.06,ease:'power3.out'});
+      }
+    }
+    dotEls.forEach(function(d,j){d.classList.toggle('on',j===i);});
+    current=i;
+  }
+
+  render(0); stage.classList.remove('alt'); current=0;
+
+  if(window.gsap && window.ScrollTrigger){
+    var scrolly=document.getElementById('scrolly');
+    scrolly.style.height=(CRAFTS.length*80)+'vh';
+    ScrollTrigger.create({
+      trigger:scrolly,start:'top top',end:'bottom bottom',scrub:true,
+      onUpdate:function(self){
+        var i=Math.min(CRAFTS.length-1,Math.floor(self.progress*CRAFTS.length));
+        show(i);
+      }
+    });
+  }
+
+  // contextual cursor zone
+  document.querySelectorAll('.community,.iron-reveal').forEach(function(s){
+    s.addEventListener('mouseenter',function(){inCraftZone=true;updateCursorIcon();});
+    s.addEventListener('mouseleave',function(){inCraftZone=false;updateCursorIcon();});
+  });
+})();
+
+/* ============================== GSAP SCROLL ANIMATIONS ============================== */
+if(window.gsap && window.ScrollTrigger){
+  gsap.registerPlugin(ScrollTrigger);
+  if(window.Flip) gsap.registerPlugin(Flip);
+
+  /* manifesto word lighting */
+  (function(){
+    var p=document.getElementById('manifesto');
+    var tmp=document.createElement('div');tmp.innerHTML=p.innerHTML;
+    function wrap(node){var out=document.createDocumentFragment();
+      node.childNodes.forEach(function(n){
+        if(n.nodeType===3){n.textContent.split(/(\s+)/).forEach(function(w){
+          if(w.trim()===''){out.appendChild(document.createTextNode(w));}
+          else{var s=document.createElement('span');s.className='word';s.textContent=w;out.appendChild(s);}});}
+        else{var s=document.createElement('span');s.className='word';s.innerHTML='<em>'+n.textContent+'</em>';out.appendChild(s);}});
+      return out;}
+    p.innerHTML='';p.appendChild(wrap(tmp));
+    var words=p.querySelectorAll('.word');
+    ScrollTrigger.create({trigger:p,start:'top 75%',end:'bottom 55%',scrub:true,
+      onUpdate:function(self){var n=Math.floor(self.progress*words.length*1.1);words.forEach(function(w,i){w.classList.toggle('lit',i<n);});}});
+  })();
+
+  /* wrinkled -> smooth text */
+  gsap.utils.toArray('.wrinkle').forEach(function(el){
+    gsap.fromTo(el,{filter:'blur(7px)',skewX:-9,y:16,opacity:.4},
+      {filter:'blur(0px)',skewX:0,y:0,opacity:1,ease:'none',
+       scrollTrigger:{trigger:el,start:'top 88%',end:'top 50%',scrub:true}});
+  });
+
+  /* marquees */
+  gsap.to('#marquee1',{xPercent:-30,ease:'none',scrollTrigger:{trigger:'.marquee',start:'top bottom',end:'bottom top',scrub:.6}});
+  gsap.to('#footMarq',{xPercent:-40,ease:'none',scrollTrigger:{trigger:'footer',start:'top bottom',end:'bottom top',scrub:.6}});
+
+  /* horizontal how */
+  (function(){
+    var track=document.getElementById('htrack');
+    function build(){
+      var amount=track.scrollWidth-document.querySelector('.htrack-wrap').clientWidth;
+      if(amount>0) gsap.to(track,{x:-amount,ease:'none',scrollTrigger:{trigger:'.how',start:'top top',end:'+='+amount,scrub:.8,pin:true,invalidateOnRefresh:true}});
+    }
+    build();
+  })();
+
+  /* iron-gliding mask reveal */
+  (function(){
+    var smooth=document.getElementById('smoothLayer');
+    var iron=document.getElementById('ironGlide');
+    iron.innerHTML=ICONS.iron.replace('<svg','<svg style="fill:#16120d;stroke:#fff"');
+    ScrollTrigger.create({trigger:'#irStage',start:'top 80%',end:'bottom 30%',scrub:true,
+      onUpdate:function(self){
+        var pr=self.progress; // 0..1
+        smooth.style.clipPath='inset(0 '+(100-pr*100)+'% 0 0)';
+        iron.style.left=(pr*100)+'%';
+      }});
+  })();
+
+  /* running-stitch dividers */
+  document.querySelectorAll('[data-stitch]').forEach(function(host){
+    var W=1200,H=130;
+    host.innerHTML=
+      '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">'
+      +'<path class="stitch-path" d="M0 65 Q 300 5 600 65 T 1200 65"/></svg>'
+      +'<div class="needle">'+ICONS.needle.replace('<svg','<svg style="stroke:#9c3f29"')+'</div>';
+    var path=host.querySelector('.stitch-path');
+    var needle=host.querySelector('.needle');
+    var len=path.getTotalLength();
+    path.style.strokeDasharray=len; path.style.strokeDashoffset=len;
+    ScrollTrigger.create({trigger:host,start:'top 92%',end:'bottom 40%',scrub:true,
+      onUpdate:function(self){
+        var drawn=len*self.progress;
+        path.style.strokeDashoffset=len-drawn;
+        var pt=path.getPointAtLength(drawn);
+        var rect=host.getBoundingClientRect();
+        needle.style.left=(pt.x/W*rect.width)+'px';
+        needle.style.top=(pt.y/H*rect.height)+'px';
+        needle.style.opacity=self.progress>0.02&&self.progress<0.99?1:0;
+      }});
+  });
+
+  setTimeout(function(){ScrollTrigger.refresh();},700);
+}
+
+/* ============================== STEAM WISPS ============================== */
+(function(){
+  var wrap=document.getElementById('steamWrap');if(!wrap)return;
+  for(var i=0;i<6;i++){var s=document.createElement('span');s.className='steam';
+    s.style.left=(20+i*30)+'px';s.style.animationDelay=(i*0.6)+'s';
+    s.style.animationDuration=(3.6+i*0.3)+'s';wrap.appendChild(s);}
+})();
+
+/* ============================== CURSOR + TRAIL + MAGNETIC ============================== */
+var updateCursorIcon=function(){};
+(function(){
+  if(!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+  var cursor=document.getElementById('cursor');
+  var ico=cursor.querySelector('.ico');
+  var canvas=document.getElementById('cursor-canvas');
+  var ctx=canvas.getContext('2d');
+  function size(){canvas.width=innerWidth;canvas.height=innerHeight;}size();addEventListener('resize',size);
+
+  var mx=innerWidth/2,my=innerHeight/2,dx=mx,dy=my,trail=[],hovering=false;
+  addEventListener('mousemove',function(e){
+    mx=e.clientX;my=e.clientY;
+    trail.push({x:mx,y:my,life:1});if(trail.length>55)trail.shift();
+    cursor.classList.remove('hide');
+  });
+  addEventListener('mouseout',function(){cursor.classList.add('hide');});
+
+  updateCursorIcon=function(){
+    if(inCraftZone && activeCraftIcon && ICONS[activeCraftIcon]){
+      ico.innerHTML=ICONS[activeCraftIcon];
+      cursor.classList.add('craft');
+    } else {
+      cursor.classList.remove('craft');
+    }
+  };
+
+  document.querySelectorAll('a,button,[data-cursor],input,select,.fcell,.hcard,.chip,.provider').forEach(function(el){
+    el.addEventListener('mouseenter',function(){hovering=true;if(!cursor.classList.contains('craft'))cursor.classList.add('hover');});
+    el.addEventListener('mouseleave',function(){hovering=false;cursor.classList.remove('hover');});
+  });
+
+  var magnets=[];
+  function collectMagnets(){magnets=Array.prototype.slice.call(document.querySelectorAll('[data-magnetic]'));}
+  collectMagnets();
+
+  function loop(){
+    dx+=(mx-dx)*0.2;dy+=(my-dy)*0.2;
+    cursor.style.transform='translate('+dx+'px,'+dy+'px) translate(-50%,-50%)';
+
+    // magnetic pull
+    magnets.forEach(function(el){
+      var r=el.getBoundingClientRect();
+      var cx=r.left+r.width/2, cy=r.top+r.height/2;
+      var dist=Math.hypot(mx-cx,my-cy), radius=Math.max(90,r.width*0.9);
+      if(dist<radius){var f=(1-dist/radius);el.style.transform='translate('+((mx-cx)*0.35*f)+'px,'+((my-cy)*0.35*f)+'px)';}
+      else{el.style.transform='';}
+    });
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for(var i=0;i<trail.length;i++){var t=trail[i];t.life*=0.92;
+      ctx.beginPath();ctx.fillStyle='rgba(255,255,255,'+(t.life*0.55)+')';
+      ctx.arc(t.x,t.y,8*(i/trail.length),0,Math.PI*2);ctx.fill();}
+    trail=trail.filter(function(t){return t.life>0.04;});
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* ============================== RIPPLE / DISPLACEMENT HOVER ============================== */
+(function(){
+  var disp=document.getElementById('rippleDisp');
+  var turb=document.getElementById('rippleTurb');
+  if(!disp)return;
+  document.querySelectorAll('.displace').forEach(function(el){
+    el.style.filter='url(#ripple)';
+    var raf=null,t=0,target=0,scale=0;
+    function anim(){
+      scale+=(target-scale)*0.12;
+      t+=0.012;
+      turb.setAttribute('baseFrequency',(0.012+Math.sin(t)*0.004)+' '+(0.02+Math.cos(t*0.8)*0.004));
+      disp.setAttribute('scale',scale.toFixed(2));
+      if(scale>0.2||target>0){raf=requestAnimationFrame(anim);}else{disp.setAttribute('scale','0');raf=null;}
+    }
+    el.addEventListener('mouseenter',function(){target=16;if(!raf)anim();});
+    el.addEventListener('mouseleave',function(){target=0;});
+  });
+})();
+
+/* ============================== SIGNUP + VERIFICATION ============================== */
+(function(){
+  var signup={role:'customer',name:'',email:'',city:'',craft:'',phone:'',otp:''};
+  document.querySelectorAll('.role-toggle .role').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('.role-toggle .role').forEach(function(b){b.classList.remove('on')});
+      btn.classList.add('on');signup.role=btn.dataset.role;
+      document.getElementById('craftField').style.display=signup.role==='artisan'?'block':'none';
+    });
+  });
+  function setError(name,msg){var el=document.querySelector('.err[data-for="'+name+'"]');if(el)el.textContent=msg||'';
+    var input=document.getElementById(name);if(input){msg?input.classList.add('invalid'):input.classList.remove('invalid');}}
+  document.getElementById('detailsForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var name=document.getElementById('name').value.trim(),email=document.getElementById('email').value.trim(),
+        city=document.getElementById('city').value.trim(),phone=document.getElementById('phone').value.trim(),
+        craft=document.getElementById('craft').value,ok=true;
+    if(name.length<2){setError('name','Please enter your name');ok=false}else setError('name');
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){setError('email','Enter a valid email');ok=false}else setError('email');
+    if(city.length<2){setError('city','Enter your city');ok=false}else setError('city');
+    if(signup.role==='artisan'&&!craft){setError('craft','Select your craft');ok=false}else setError('craft');
+    if(!/^[6-9]\d{9}$/.test(phone)){setError('phone','Enter a valid 10-digit mobile number');ok=false}else setError('phone');
+    if(!ok)return;
+    signup.name=name;signup.email=email;signup.city=city;signup.phone=phone;signup.craft=craft;
+    signup.otp=String(Math.floor(100000+Math.random()*900000));
+    document.getElementById('otpPhone').textContent='+91 '+phone.slice(0,2)+'••••'+phone.slice(-2);
+    document.getElementById('demoHint').textContent='Demo code: '+signup.otp+' (a real SMS will be sent when live)';
+    document.getElementById('detailsForm').style.display='none';
+    document.getElementById('otpForm').style.display='block';
+    document.querySelector('#otpBoxes input').focus();
+    if(window.ScrollTrigger)ScrollTrigger.refresh();
+  });
+  var otpInputs=document.querySelectorAll('#otpBoxes input');
+  otpInputs.forEach(function(inp,i){
+    inp.addEventListener('input',function(){inp.value=inp.value.replace(/\D/g,'');if(inp.value&&i<otpInputs.length-1)otpInputs[i+1].focus();});
+    inp.addEventListener('keydown',function(e){if(e.key==='Backspace'&&!inp.value&&i>0)otpInputs[i-1].focus();});
+    inp.addEventListener('paste',function(e){e.preventDefault();var d=(e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6).split('');d.forEach(function(x,j){if(otpInputs[j])otpInputs[j].value=x});if(otpInputs[Math.min(d.length,5)])otpInputs[Math.min(d.length,5)].focus();});
+  });
+  document.getElementById('editPhone').addEventListener('click',function(e){e.preventDefault();document.getElementById('otpForm').style.display='none';document.getElementById('detailsForm').style.display='block';setError('otp');});
+  document.getElementById('resendOtp').addEventListener('click',function(e){e.preventDefault();signup.otp=String(Math.floor(100000+Math.random()*900000));document.getElementById('demoHint').textContent='Demo code: '+signup.otp+' (a real SMS will be sent when live)';});
+  document.getElementById('otpForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var entered=Array.from(otpInputs).map(function(i){return i.value}).join('');
+    if(entered.length<6){setError('otp','Enter all 6 digits');return}
+    if(entered!==signup.otp){setError('otp','Incorrect code, please try again');return}
+    setError('otp');console.log('Verified signup:',signup);
+    document.getElementById('otpForm').style.display='none';
+    document.getElementById('successMsg').textContent=signup.role==='artisan'
+      ? 'Welcome, '+signup.name.split(' ')[0]+'. Our team will reach out to bring your craft onto Project dhoB.'
+      : "You're on the list, "+signup.name.split(' ')[0]+'. We\'ll tell you the moment dhoB lives in '+signup.city+'.';
+    document.getElementById('successState').style.display='block';
+    if(window.ScrollTrigger)ScrollTrigger.refresh();
+  });
+})();
+
+/* ============================== BOOKING OVERLAY ============================== */
+(function(){
+  var SERVICES=[
+    {k:'wash',label:'Wash & fold'},{k:'iron',label:'Ironing'},{k:'dryclean',label:'Dry clean'},
+    {k:'stitch',label:'Stitching / Alteration'},{k:'fallpico',label:'Fall & Pico'},{k:'darn',label:'Darning / Rafoo'},
+    {k:'embroider',label:'Embroidery'},{k:'shoe',label:'Shoe & leather'},{k:'carpet',label:'Carpet & upholstery'},
+    {k:'wool',label:'Wool & shawl'},{k:'sneaker',label:'Sneaker care'},{k:'bag',label:'Bag repair'}
+  ];
+  var LABELS={};SERVICES.forEach(function(s){LABELS[s.k]=s.label;});
+  var PROVIDERS=[
+    {name:'Sharma Laundry',area:'Indiranagar',rating:4.8,dist:0.4,svc:['wash','iron','dryclean'],express:true,price:15,unit:'/pc'},
+    {name:'Raju Dhobi',area:'Domlur',rating:4.6,dist:0.7,svc:['wash','iron'],express:false,price:12,unit:'/pc'},
+    {name:'QuickPress Express',area:'HAL 2nd Stage',rating:4.9,dist:1.1,svc:['iron'],express:true,price:10,unit:'/pc'},
+    {name:'Anwar Tailors',area:'Jeevan Bhima Nagar',rating:4.7,dist:0.9,svc:['stitch','fallpico'],express:false,price:120,unit:'onward'},
+    {name:'Lakshmi Pico Works',area:'CV Raman Nagar',rating:4.8,dist:1.4,svc:['fallpico','stitch'],express:true,price:80,unit:'/saree'},
+    {name:'Hidden Stitch Rafoo',area:'Ulsoor',rating:4.9,dist:2.1,svc:['darn'],express:false,price:250,unit:'onward'},
+    {name:'Zari Atelier',area:'Frazer Town',rating:5.0,dist:3.0,svc:['embroider'],express:false,price:600,unit:'onward'},
+    {name:'Cobbler King',area:'Indiranagar',rating:4.5,dist:0.6,svc:['shoe','bag'],express:true,price:150,unit:'onward'},
+    {name:'FreshHome Cleaners',area:'Koramangala',rating:4.6,dist:2.5,svc:['carpet'],express:false,price:400,unit:'onward'},
+    {name:'Pashmina Care',area:'Richmond Town',rating:4.8,dist:3.4,svc:['wool','darn'],express:false,price:350,unit:'onward'},
+    {name:'SoleRevive',area:'HSR Layout',rating:4.7,dist:1.8,svc:['sneaker'],express:true,price:300,unit:'/pair'},
+    {name:'BagSpa',area:'MG Road',rating:4.6,dist:2.9,svc:['bag','shoe'],express:false,price:450,unit:'onward'},
+    {name:'dhoB Atelier (Premium)',area:'Company studio',rating:4.9,dist:2.2,svc:['wash','iron','dryclean','stitch','sneaker'],express:true,price:35,unit:'/pc'}
+  ];
+  var state={service:'',time:'standard',location:''};
+
+  // build chips
+  var chips=document.getElementById('serviceChips');
+  var all=document.createElement('button');all.className='chip on';all.textContent='All crafts';all.dataset.svc='';chips.appendChild(all);
+  SERVICES.forEach(function(s){var b=document.createElement('button');b.className='chip';b.textContent=s.label;b.dataset.svc=s.k;chips.appendChild(b);});
+  chips.querySelectorAll('.chip').forEach(function(c){c.setAttribute('data-cursor','');c.addEventListener('click',function(){
+    chips.querySelectorAll('.chip').forEach(function(x){x.classList.remove('on')});c.classList.add('on');state.service=c.dataset.svc;render();
+  });});
+
+  var timeToggle=document.getElementById('timeToggle');
+  timeToggle.querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){
+    timeToggle.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');state.time=b.dataset.time;render();
+  });});
+
+  document.getElementById('bkLocation').addEventListener('input',function(e){state.location=e.target.value;});
+
+  function render(){
+    var list=document.getElementById('providerList');
+    var rows=PROVIDERS.filter(function(p){
+      if(state.service && p.svc.indexOf(state.service)===-1)return false;
+      if(state.time==='express' && !p.express)return false;
+      return true;
+    }).sort(function(a,b){return a.dist-b.dist;});
+    document.getElementById('bkCount').innerHTML='<b>'+rows.length+'</b> provider'+(rows.length===1?'':'s')+' near you'+(state.time==='express'?' · express 3–4 hr':' · standard 24–48 hr');
+    if(!rows.length){list.innerHTML='<div class="bk-empty">No providers match yet for this craft + timeframe. Try “Standard”, or pick another craft — we add new artisans every week.</div>';return;}
+    list.innerHTML=rows.map(function(p){
+      var price=state.time==='express'?Math.round(p.price*1.7):p.price;
+      var tags=p.svc.slice(0,3).map(function(k){return '<span>'+LABELS[k]+'</span>';}).join('');
+      return '<div class="provider"><div class="pinfo">'
+        +'<h4>'+p.name+(p.express?' <span class="exp">⚡ Express</span>':'')+'</h4>'
+        +'<div class="meta"><span>⭐ '+p.rating.toFixed(1)+'</span><span>📍 '+p.dist+' km · '+p.area+'</span><span>⏱ '+(state.time==='express'?'3–4 hr':'24–48 hr')+'</span></div>'
+        +'<div class="tags">'+tags+'</div></div>'
+        +'<div class="pright"><div class="price">₹'+price+' <small>'+p.unit+'</small></div>'
+        +'<button class="pick" data-cursor>Select</button></div></div>';
+    }).join('');
+    list.querySelectorAll('.pick').forEach(function(btn){btn.addEventListener('click',function(){btn.textContent='✓ Request sent';btn.classList.add('done');});});
+  }
+  render();
+
+  // open/close
+  var overlay=document.getElementById('booking');
+  function open(){overlay.classList.add('open');if(lenis)lenis.stop();}
+  function close(){overlay.classList.remove('open');if(lenis)lenis.start();}
+  document.getElementById('bookFab').addEventListener('click',open);
+  document.getElementById('bkClose').addEventListener('click',close);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&overlay.classList.contains('open'))close();});
+})();
+</script>
+</body>
+</html>
