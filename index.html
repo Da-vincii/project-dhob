@@ -133,8 +133,32 @@
 
   .figure{position:relative;height:80vh;display:flex;align-items:flex-end;justify-content:center}
   .figure .bignum{position:absolute;top:-2%;left:50%;transform:translateX(-50%);font-family:var(--serif);font-size:clamp(180px,28vw,440px);font-weight:300;color:rgba(243,239,230,.06);z-index:0;line-height:1;user-select:none;pointer-events:none}
-  .figure .cutout{position:relative;z-index:2;height:90%;width:auto;filter:drop-shadow(0 30px 60px rgba(0,0,0,.5))}
+  .figbody{position:relative;z-index:2;width:100%;height:92%;display:flex;align-items:flex-end;justify-content:center}
   .figure .slot-note{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);z-index:3;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(243,239,230,.4);white-space:nowrap}
+  /* single photo */
+  .single{height:100%;display:flex;align-items:flex-end;justify-content:center}
+  .single .cutout{height:100%;width:auto;max-width:100%;object-fit:contain}
+  /* composite: two photos blended into one continuous visual */
+  .composite{width:100%;height:94%;display:flex;align-items:center;justify-content:center}
+  .composite .part{width:56%;height:100%;object-fit:cover}
+  .composite .part-r{margin-left:-9%}
+  /* tone-matching + background integration */
+  .cutout,.composite .part{filter:grayscale(100%) contrast(1.06) brightness(1.05);mix-blend-mode:luminosity;opacity:.9}
+  .cutout.mono,.composite .part.mono{filter:contrast(1.06) brightness(1.05)}      /* already B&W → skip grayscale */
+  .cutout.placeholder{filter:none;mix-blend-mode:normal;opacity:1}
+  .single .cutout{
+    -webkit-mask-image:radial-gradient(ellipse 80% 94% at 50% 46%, #000 50%, transparent 100%);
+    mask-image:radial-gradient(ellipse 80% 94% at 50% 46%, #000 50%, transparent 100%);}
+  .composite .part-l{
+    -webkit-mask-image:linear-gradient(to right,#000 52%,transparent 97%),radial-gradient(ellipse 92% 94% at 60% 46%,#000 54%,transparent 100%);
+    -webkit-mask-composite:source-in;
+    mask-image:linear-gradient(to right,#000 52%,transparent 97%),radial-gradient(ellipse 92% 94% at 60% 46%,#000 54%,transparent 100%);
+    mask-composite:intersect;}
+  .composite .part-r{
+    -webkit-mask-image:linear-gradient(to left,#000 52%,transparent 97%),radial-gradient(ellipse 92% 94% at 40% 46%,#000 54%,transparent 100%);
+    -webkit-mask-composite:source-in;
+    mask-image:linear-gradient(to left,#000 52%,transparent 97%),radial-gradient(ellipse 92% 94% at 40% 46%,#000 54%,transparent 100%);
+    mask-composite:intersect;}
 
   .rail{position:absolute;left:32px;top:50%;transform:translateY(-50%);z-index:5;display:flex;align-items:center;gap:16px}
   .rail b{font-family:var(--serif);font-size:11px;letter-spacing:.2em;color:rgba(243,239,230,.4);writing-mode:vertical-rl}
@@ -377,7 +401,7 @@
         </div>
         <div class="figure" id="figure">
           <div class="bignum" id="cNum"></div>
-          <img class="cutout" id="cCut" alt="" />
+          <div class="figbody" id="cBody"></div>
           <div class="slot-note" id="cNote"></div>
         </div>
       </div>
@@ -533,37 +557,37 @@ var ICONS = {
 var CRAFTS = [
   {idx:'01',num:'I',  name:'The Dhobi',     role:'Washing & care',     icon:'drop',
    desc:'Before sunrise, by the ghat or the rooftop tank, the dhobi reads cloth like a language — what can be beaten, what must be coaxed. Generations of care in every fold returned to you.',
-   a:'4am',al:'Day begins',b:'24h',bl:'Back to you',color:'#7aa0c4',photo:''},
+   a:'4am',al:'Day begins',b:'24h',bl:'Back to you',color:'#7aa0c4',photos:['dhobi-1.jpg','dhobi-2.jpg'],mono:[false,true]},
   {idx:'02',num:'II', name:'The Istriwala', role:'Pressing & finish',   icon:'iron',
    desc:'A coal iron, heavy and certain. The istriwala turns crumpled into crisp with a hiss of steam and a practised wrist — the last, sharpest word a garment speaks.',
-   a:'500°',al:'Coal-iron heat',b:'0',bl:'Creases left',color:'#c0563b',photo:''},
+   a:'500°',al:'Coal-iron heat',b:'0',bl:'Creases left',color:'#c0563b',photos:['istriwala-1.jpg','istriwala-2.jpg'],mono:[false,false]},
   {idx:'03',num:'III',name:'The Darzi',      role:'Tailoring & stitch',  icon:'scissors',
    desc:'Chalk, tape, and an eye that measures more than inches. The darzi makes cloth obey the body — a hem set right, a seam reborn, a fit that finally feels like yours.',
-   a:'1mm',al:'Margin of error',b:'∞',bl:'Alterations',color:'#5a7d5a',photo:''},
+   a:'1mm',al:'Margin of error',b:'∞',bl:'Alterations',color:'#5a7d5a',photos:['darzi-1.jpg','darzi-2.jpg'],mono:[true,false]},
   {idx:'04',num:'IV', name:'Fall & Pico',    role:'Saree finishing',     icon:'needle',
    desc:'The quiet artisans of the saree — attaching the fall so it drapes, picoing the edge so it never frays. Invisible work that lets six yards move like water.',
-   a:'6 yd',al:'Of silk',b:'1',bl:'Perfect drape',color:'#b07aa1',photo:''},
+   a:'6 yd',al:'Of silk',b:'1',bl:'Perfect drape',color:'#b07aa1',photos:['fall-pico.jpg'],mono:[false]},
   {idx:'05',num:'V',  name:'The Rafoogar',   role:'Invisible mending',   icon:'needle',
    desc:'Thread by thread, the rafoogar re-weaves what was lost — a moth-hole, a tear, a burn — until the wound in the weave simply disappears. Memory, repaired.',
-   a:'200+',al:'Stitches/inch',b:'0',bl:'Trace left',color:'#c79a4b',photo:''},
+   a:'200+',al:'Stitches/inch',b:'0',bl:'Trace left',color:'#c79a4b',photos:['rafoogar-1.jpg','rafoogar-2.jpg'],mono:[false,false]},
   {idx:'06',num:'VI', name:'The Embroiderer',role:'Zardozi & chikankari',icon:'hoop',
    desc:'Hoop drawn tight, needle dipping like a bird — zardozi gold, chikankari shadow-work, threadwork that turns plain cloth into heirloom. Patience measured in months.',
-   a:'30k',al:'Stitches / motif',b:'1',bl:'Of a kind',color:'#a06c2c',photo:''},
+   a:'30k',al:'Stitches / motif',b:'1',bl:'Of a kind',color:'#a06c2c',photos:['embroiderer.jpg'],mono:[false]},
   {idx:'07',num:'VII',name:'The Mochi',      role:'Shoe & leather repair',icon:'shoe',
    desc:'At the corner with awl and wax thread, the mochi gives shoes a second life — resoled, restitched, polished to a shine that outlasts the day you bought them.',
-   a:'2nd',al:'Life for soles',b:'48h',bl:'Like-new',color:'#8a5a3c',photo:''},
+   a:'2nd',al:'Life for soles',b:'48h',bl:'Like-new',color:'#8a5a3c',photos:['mochi.jpg'],mono:[false]},
   {idx:'08',num:'VIII',name:'Carpet & Upholstery',role:'Deep cleaning',  icon:'brush',
    desc:'The big, heavy, forgotten things — rugs, mattresses, sofas, durries that hold a year of footsteps. Beaten, washed, steam-cleaned and sun-dried back to life.',
-   a:'12kg',al:'Lifted by hand',b:'1 day',bl:'Sun-dried',color:'#6b8e8e',photo:''},
+   a:'12kg',al:'Lifted by hand',b:'1 day',bl:'Sun-dried',color:'#6b8e8e',photos:['carpet.jpg'],mono:[false]},
   {idx:'09',num:'IX', name:'Wool & Shawl',   role:'Mending & care',      icon:'yarn',
    desc:'For pashmina, wool and the shawl passed down a generation — gentle hands that mend a pull, refelt a hole, and store winter away soft and moth-free.',
-   a:'-5°',al:'Made for cold',b:'∞',bl:'Winters',color:'#9a8fb0',photo:''},
+   a:'-5°',al:'Made for cold',b:'∞',bl:'Winters',color:'#9a8fb0',photos:['wool-1.jpg','wool-2.jpg'],mono:[false,false]},
   {idx:'10',num:'X',  name:'Sneaker Care',   role:'Cleaning & restore',  icon:'sneaker',
    desc:'Midsoles whitened, uppers deep-cleaned, creases eased — the sneakerhead\'s ritual, done right. Your grails back to box-fresh, without the risk.',
-   a:'1:1',al:'Box-fresh',b:'72h',bl:'Turnaround',color:'#4f6dba',photo:''},
+   a:'1:1',al:'Box-fresh',b:'72h',bl:'Turnaround',color:'#4f6dba',photos:['sneaker.jpg'],mono:[false]},
   {idx:'11',num:'XI', name:'Bag Repair',     role:'Restore & revive',    icon:'bag',
    desc:'Zips replaced, handles re-stitched, leather fed and edges re-painted — the specialists who bring a tired everyday bag, or a treasured one, back to its best.',
-   a:'1',al:'Loved again',b:'5d',bl:'Full revive',color:'#7d5a4a',photo:''}
+   a:'1',al:'Loved again',b:'5d',bl:'Full revive',color:'#7d5a4a',photos:['bag-repair.jpg'],mono:[false]}
 ];
 
 function figureSVG(color){
@@ -622,17 +646,33 @@ var activeCraftIcon=null, inCraftZone=false;
   var dots=document.getElementById('railDots');
   CRAFTS.forEach(function(c,i){var d=document.createElement('i');if(i===0)d.className='on';dots.appendChild(d);});
   var dotEls=dots.querySelectorAll('i');
-  var els={idx:cIdx,name:cName,role:cRole,desc:cDesc,a:cA,al:cAL,b:cB,bl:cBL,num:cNum,cut:cCut,note:cNote};
+  var els={idx:cIdx,name:cName,role:cRole,desc:cDesc,a:cA,al:cAL,b:cB,bl:cBL,num:cNum,body:cBody,note:cNote};
   var figure=document.getElementById('figure'), txt=document.getElementById('txt');
-  var current=-1, flipping=false;
+  var PHOTO_BASE='public/images/community/';
+  var current=-1;
+
+  function buildFigure(c){
+    if(!c.photos || !c.photos.length){
+      return '<div class="single"><img class="cutout placeholder" src="'+figureSVG(c.color)+'" alt="'+c.name+'"/></div>';
+    }
+    function cls(i){return 'cutout'+(c.mono && c.mono[i]?' mono':'');}
+    if(c.photos.length===1){
+      return '<div class="single"><img class="'+cls(0)+'" src="'+PHOTO_BASE+c.photos[0]+'" alt="'+c.name+'"/></div>';
+    }
+    // composite: two photos overlapped + gradient-masked + tone-matched into one visual
+    return '<div class="composite">'
+      +'<img class="part part-l'+(c.mono&&c.mono[0]?' mono':'')+'" src="'+PHOTO_BASE+c.photos[0]+'" alt="'+c.name+'"/>'
+      +'<img class="part part-r'+(c.mono&&c.mono[1]?' mono':'')+'" src="'+PHOTO_BASE+c.photos[1]+'" alt="'+c.name+'"/>'
+      +'</div>';
+  }
 
   function render(i){
     var c=CRAFTS[i];
     els.idx.textContent='— '+c.idx; els.name.textContent=c.name; els.role.textContent=c.role;
     els.desc.textContent=c.desc; els.a.textContent=c.a; els.al.textContent=c.al;
     els.b.textContent=c.b; els.bl.textContent=c.bl; els.num.textContent=c.num;
-    els.cut.src=c.photo||figureSVG(c.color);
-    els.note.textContent=c.photo?'':'◊ photo slot — real cutout drops in here';
+    els.body.innerHTML=buildFigure(c);
+    els.note.textContent=(c.photos && c.photos.length)?'':'◊ photo slot — real cutout drops in here';
   }
 
   function show(i){
@@ -648,7 +688,7 @@ var activeCraftIcon=null, inCraftZone=false;
     if(useFlip){
       Flip.from(state,{duration:.7,ease:'power3.inOut',absolute:true});
       if(window.gsap){
-        gsap.fromTo(els.cut,{opacity:0,scale:1.05},{opacity:1,scale:1,duration:.7,ease:'power3.out'});
+        gsap.fromTo(els.body,{opacity:0,y:34,scale:1.04},{opacity:1,y:0,scale:1,duration:.7,ease:'power3.out'});
         gsap.fromTo([els.name,els.desc],{y:22,opacity:0},{y:0,opacity:1,duration:.55,stagger:.06,ease:'power3.out'});
       }
     }
